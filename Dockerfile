@@ -31,6 +31,25 @@ runpod-worker-comfy:
   insightface: models/insightface/
 YAML
 
+RUN cat > /usr/local/bin/link-extra-models.sh <<'SH'
+#!/bin/bash
+set -e
+mkdir -p /comfyui/models
+for d in ipadapter insightface clip_vision; do
+  src="/runpod-volume/models/$d"
+  dst="/comfyui/models/$d"
+  if [ -d "$src" ]; then
+    if [ -L "$dst" ] || [ ! -e "$dst" ]; then
+      ln -sfn "$src" "$dst"
+      echo "[link-extra-models] Linked $dst -> $src"
+    fi
+  fi
+done
+SH
+RUN chmod +x /usr/local/bin/link-extra-models.sh
+
+CMD ["/bin/bash", "-lc", "/usr/local/bin/link-extra-models.sh && exec /start.sh"]
+
 RUN python -c "import insightface; print('insightface ok', insightface.__version__)" || true
 
 LABEL org.opencontainers.image.title="image-gen-tool worker-comfyui (ipadapter)"
