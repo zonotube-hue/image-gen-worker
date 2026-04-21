@@ -1,5 +1,5 @@
 # RunPod Serverless ComfyUI Worker + IP-Adapter Face (SDXL)
-FROM runpod/worker-comfyui:latest
+FROM ghcr.io/runpod-workers/worker-comfyui:latest
 
 RUN set -eux; \
     cd /comfyui/custom_nodes && \
