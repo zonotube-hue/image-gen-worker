@@ -9,6 +9,12 @@ RUN set -eux; \
     cd /comfyui/custom_nodes && \
     git clone --depth 1 https://github.com/cubiq/ComfyUI_IPAdapter_plus.git
 
+RUN set -eux; \
+    cd /comfyui/custom_nodes && \
+    git clone --depth 1 https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
+    cd comfyui_controlnet_aux && \
+    pip install --no-cache-dir -r requirements.txt || true
+
 RUN pip install --no-cache-dir \
       insightface \
       onnxruntime-gpu
@@ -35,7 +41,7 @@ RUN cat > /usr/local/bin/link-extra-models.sh <<'SH'
 #!/bin/bash
 set -e
 mkdir -p /comfyui/models
-for d in ipadapter insightface clip_vision; do
+for d in ipadapter insightface clip_vision controlnet; do
   src="/runpod-volume/models/$d"
   dst="/comfyui/models/$d"
   if [ -d "$src" ]; then
@@ -52,4 +58,4 @@ CMD ["/bin/bash", "-lc", "/usr/local/bin/link-extra-models.sh && exec /start.sh"
 
 RUN python -c "import insightface; print('insightface ok', insightface.__version__)" || true
 
-LABEL org.opencontainers.image.title="image-gen-tool worker-comfyui (ipadapter)"
+LABEL org.opencontainers.image.title="image-gen-tool worker-comfyui (ipadapter+controlnet)"
